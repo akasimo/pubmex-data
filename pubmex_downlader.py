@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[60]:
+# In[8]:
 
 
 import requests, os,time
@@ -14,14 +14,14 @@ import multiprocessing, urllib
 import gzip, shutil
 
 
-# In[30]:
+# In[9]:
 
 
 def print_date(date):
     return date.strftime("%Y%m%d")
 
 
-# In[32]:
+# In[10]:
 
 
 def create_dates(starting_from):
@@ -30,7 +30,7 @@ def create_dates(starting_from):
     return date_list
 
 
-# In[55]:
+# In[11]:
 
 
 def save_links(dl_folder, links, starting_from):
@@ -40,17 +40,15 @@ def save_links(dl_folder, links, starting_from):
     return links
 
 
-# In[61]:
+# In[12]:
 
 
 def process_url(link):
+    print(link)
     
-    print(count, link)
-    count += 1
-    
-    if "csv.gz" or ".zip" not in link:
+    if not (".gz" in link or ".zip" in link):
         print( "not a dl link")
-        return count
+        return 
         
     filename = link.split("/")[-1]
     filepath = os.path.join(dl_folder, filename)
@@ -61,16 +59,16 @@ def process_url(link):
         
     if filename in os.listdir(dl_folder):
         print( "already downloaded" )
-        return count
+        return 
     elif csvpath in os.listdir(dl_folder):
         print("csv already downloaded")
     else:
         urllib.request.urlretrieve(link, filepath)
         print("downloading")
-    return count
+    return 
 
 
-# In[ ]:
+# In[13]:
 
 
 def unzip(zipfile, dl_folder, zcount):
@@ -98,12 +96,11 @@ def unzip(zipfile, dl_folder, zcount):
         return zcount
 
 
-# In[62]:
+# In[14]:
 
 
 dl_types = ["quote", "trade"]
 start_date = datetime(year = 2014, month = 11, day = 22)
-
 for dl_type in dl_types:
     dl_folder = dl_type
     if dl_folder not in os.listdir():
@@ -111,9 +108,10 @@ for dl_type in dl_types:
     base_url = "https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/"+dl_folder+"/"
     href_links = []
     href_links = save_links(dl_folder, href_links, start_date)
+    
     count = 1
     pool = multiprocessing.Pool(processes=4) # how much parallelism?
-    count = pool.map(process_url, href_links, count)
+    count = pool.map(process_url, href_links)
     
     zcount = 0
     for zipfile in os.listdir(dl_folder):
