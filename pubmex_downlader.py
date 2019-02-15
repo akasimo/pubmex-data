@@ -33,7 +33,8 @@ def create_dates(starting_from):
 # In[55]:
 
 
-def save_links(dl_folder, links):
+def save_links(dl_folder, links, starting_from):
+    date_list = create_dates(starting_from)
     for i in map(print_date, date_list):
         links.append(base_url+i+".csv.gz")
     return links
@@ -109,7 +110,7 @@ for dl_type in dl_types:
         os.mkdir(dl_folder)
     base_url = "https://s3-eu-west-1.amazonaws.com/public.bitmex.com/data/"+dl_folder+"/"
     href_links = []
-    href_links = save_links(dl_folder,href_links)
+    href_links = save_links(dl_folder, href_links, start_date)
     count = 1
     pool = multiprocessing.Pool(processes=4) # how much parallelism?
     pool.map(process_url, href_links)
