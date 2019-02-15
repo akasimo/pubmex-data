@@ -40,7 +40,7 @@ def save_links(dl_folder, links, starting_from):
     return links
 
 
-# In[59]:
+# In[61]:
 
 
 def process_url(link):
@@ -50,7 +50,7 @@ def process_url(link):
     
     if "csv.gz" or ".zip" not in link:
         print( "not a dl link")
-        return
+        return count
         
     filename = link.split("/")[-1]
     filepath = os.path.join(dl_folder, filename)
@@ -61,13 +61,13 @@ def process_url(link):
         
     if filename in os.listdir(dl_folder):
         print( "already downloaded" )
-        return
+        return count
     elif csvpath in os.listdir(dl_folder):
         print("csv already downloaded")
     else:
         urllib.request.urlretrieve(link, filepath)
         print("downloading")
-    return 
+    return count
 
 
 # In[ ]:
@@ -98,7 +98,7 @@ def unzip(zipfile, dl_folder, zcount):
         return zcount
 
 
-# In[ ]:
+# In[62]:
 
 
 dl_types = ["quote", "trade"]
@@ -113,7 +113,7 @@ for dl_type in dl_types:
     href_links = save_links(dl_folder, href_links, start_date)
     count = 1
     pool = multiprocessing.Pool(processes=4) # how much parallelism?
-    pool.map(process_url, href_links)
+    count = pool.map(process_url, href_links, count)
     
     zcount = 0
     for zipfile in os.listdir(dl_folder):
